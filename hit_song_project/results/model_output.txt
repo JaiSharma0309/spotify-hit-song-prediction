@@ -1,0 +1,86 @@
+Total tracks in dataset: 2017
+Hit threshold (track_popularity): 62.0
+
+Class balance (0 = non-hit, 1 = hit):
+hit
+0    1403
+1     479
+Name: count, dtype: int64
+Name: count , dtype: int64
+
+Train size: (1505, 17) Test size: (377, 17)
+
+Dummy mean val accuracy: 0.7455149501661129
+
+[LogReg] Best params: {'logisticregression__C': 0.1}
+[LogReg] Best CV score: 0.8053156146179402
+[LogReg] Final test accuracy: 0.8514588859416445
+
+[SVM] Best params: {'svc__C': 10, 'svc__gamma': 0.01}
+[SVM] Best CV score: 0.8019933554817277
+[SVM] Final test accuracy: 0.870026525198939
+
+=== Model comparison on test set ===
+Dummy baseline:   0.746 (CV)
+LogReg test acc:  0.851
+SVM RBF test acc: 0.870
+
+=== Logistic Regression: feature effects (scaled space) ===
+
+Top 15 features increasing hit probability:
+                feature      coef
+ num__artist_popularity  1.792111
+  cat__album_type_album  0.609793
+cat__time_signature_3.0  0.263961
+             cat__key_4  0.236047
+           num__valence  0.219604
+            cat__key_11  0.146823
+             cat__key_3  0.122167
+      num__danceability  0.120901
+             cat__key_5  0.111189
+             cat__key_7  0.069325
+cat__time_signature_1.0  0.027866
+      num__acousticness  0.010487
+          num__loudness  0.003120
+             cat__key_2 -0.004986
+            cat__mode_1 -0.025516
+
+Top 15 features decreasing hit probability:
+                    feature      coef
+                cat__key_10 -0.053678
+           num__speechiness -0.056337
+                 cat__key_6 -0.069288
+                 cat__key_0 -0.081003
+                 cat__key_8 -0.082977
+           num__duration_ms -0.096159
+                 num__tempo -0.109831
+                 cat__key_9 -0.183072
+         cat__explicit_True -0.191558
+                 cat__key_1 -0.209105
+    cat__time_signature_4.0 -0.244044
+     cat__album_type_single -0.274599
+          num__release_year -0.289668
+cat__album_type_compilation -0.333752
+      num__instrumentalness -0.384442
+
+=== SVM RBF: permutation feature importance (test set) ===
+
+Top 20 features by permutation importance (SVM RBF):
+               feature  importance
+num__artist_popularity    0.178647
+     num__release_year    0.029973
+          num__valence    0.021220
+            cat__key_3    0.017109
+            cat__key_4    0.014456
+ num__instrumentalness    0.012334
+     num__danceability    0.011273
+         num__loudness    0.011141
+           num__energy    0.010610
+         num__liveness    0.008223
+            num__tempo    0.008223
+      num__speechiness    0.007162
+      num__duration_ms    0.006366
+     num__acousticness    0.005172
+            cat__key_0    0.000796
+            cat__key_2   -0.001857
+            cat__key_1   -0.003979
