@@ -1,5 +1,5 @@
-Hit Song Prediction Using Spotify Data
 
+# Hit Song Prediction Using Spotify Data
 
 In 2025, music industry analysts noticed something surprising: for the first time since 1990, not a single hip-hop song appeared in the US Billboard Top 40. This sparked a lot of debate online about whether hip-hop was “falling off,” changing direction, or simply shifting toward different listening habits. That discussion inspired this project. Instead of arguing based on opinions, I wanted to explore the question with data: what actually makes a song a hit? Using Spotify’s audio features, metadata, and artist information, this project builds a machine-learning system that predicts whether a song is likely to become a hit based purely on its characteristics. Although the motivation comes from hip-hop trends, the final dataset includes songs from all genres so the model can learn general hit-song patterns rather than genre-specific quirks.
 
