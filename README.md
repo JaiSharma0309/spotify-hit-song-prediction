@@ -12,3 +12,17 @@ To interpret what drives success, I examine logistic regression coefficients and
 Overall, this project uses real audio data and modern machine-learning techniques to analyze what contributes to commercial music success. It approaches the “hip-hop falloff” conversation from a data-driven perspective and provides a reproducible framework for studying music trends, predicting hits, and understanding how artistic and acoustic features interact with listeners’ preferences at scale.
 
 To run the project end-to-end, users must first supply their own Spotify API credentials. The script spotify_query.py requires a personal Spotify client ID and client secret, which should be set as environment variables (SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET) before running any data collection. Once the keys are configured, running spotify_query.py pulls audio features, metadata, and artist information from Spotify and writes the combined output to spotify_enriched.csv. After the dataset is created, the full modeling pipeline can be executed by running hit_song.py, which trains the models, prints all evaluation results directly to the terminal, and saves the generated charts—including ROC curves, permutation-importance plots, and violin distributions—into the figures/ directory. This provides a complete and reproducible workflow, with all results visible either in the terminal or in the generated images.
+
+
+Final SVM test accuracy: 87%
+
+Baseline accuracy: ~74.6%
+
+Most important feature: artist popularity
+
+
+
+Future Improvements:
+- Try Random Forest or XGBoost
+- Test different definitions of a "hit"
+- Add more recent Spotify data
