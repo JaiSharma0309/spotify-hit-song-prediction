@@ -26,4 +26,5 @@ Most important feature: artist popularity
 
 
 Future Improvements:
+
 In addition to accuracy, the models were evaluated using precision, recall, and F1-score to better understand their performance on the minority “hit” class. The Logistic Regression model achieved a precision of 0.733, recall of 0.656, and an F1-score of 0.692, indicating that while its predictions were fairly reliable, it still missed a meaningful share of true hits. The SVM with an RBF kernel performed slightly better overall, with precision of 0.790, recall of 0.667, and an F1-score of 0.723, suggesting it makes fewer false positive predictions while maintaining a stronger balance between identifying hits and avoiding incorrect ones. These results point to clear next steps for the project: improving recall should be a priority so the model captures more true hits, potentially through techniques like class weighting, resampling, or experimenting with models such as Random Forests or Gradient Boosting. Additionally, incorporating more recent Spotify data or alternative definitions of a “hit” could help refine performance and make the system more robust over time.
