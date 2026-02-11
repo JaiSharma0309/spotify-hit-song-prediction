@@ -16,14 +16,30 @@ Dummy mean val accuracy: 0.7455149501661129
 [LogReg] Best CV score: 0.8053156146179402
 [LogReg] Final test accuracy: 0.8514588859416445
 
+=== Logistic Regression Metrics ===
+Accuracy: 0.8514588859416445
+Precision: 0.7325581395348837
+Recall: 0.65625
+F1-score: 0.6923076923076923
+
 [SVM] Best params: {'svc__C': 10, 'svc__gamma': 0.01}
 [SVM] Best CV score: 0.8019933554817277
 [SVM] Final test accuracy: 0.870026525198939
+
+=== SVM Metrics ===
+Accuracy: 0.870026525198939
+Precision: 0.7901234567901234
+Recall: 0.6666666666666666
+F1-score: 0.7231638418079096
 
 === Model comparison on test set ===
 Dummy baseline:   0.746 (CV)
 LogReg test acc:  0.851
 SVM RBF test acc: 0.870
+
+=== Extended Model Comparison (Test Set) ===
+LogReg -> Accuracy:  0.851, Precision: 0.733, Recall: 0.656, F1: 0.692
+SVM RBF -> Accuracy: 0.870, Precision: 0.790, Recall: 0.667, F1: 0.723
 
 === Logistic Regression: feature effects (scaled space) ===
 
