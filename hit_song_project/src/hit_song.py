@@ -40,9 +40,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.pipeline import make_pipeline
 from sklearn.inspection import permutation_importance
-from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import roc_curve, auc, precision_score, recall_score, f1_score
 import matplotlib.pyplot as plt
-
 
 
 
@@ -55,7 +54,7 @@ import matplotlib.pyplot as plt
 ##          same directory as this script. Any auxiliary columns such as an
 ##          index or original "target" column are dropped if present.
 
-df = pd.read_csv("spotify_enriched.csv")
+df = pd.read_csv("data/spotify_enriched.csv")
 
 # Drop junk columns if present
 for col in ["Unnamed: 0", "target"]:
@@ -221,6 +220,14 @@ print("\n[LogReg] Best params:", log_grid.best_params_)
 print("[LogReg] Best CV score:", log_cv)
 print("[LogReg] Final test accuracy:", log_test_acc)
 
+# --- NEW: Classification metrics for Logistic Regression ---
+logreg_preds = log_best.predict(X_test)
+
+print("\n=== Logistic Regression Metrics ===")
+print("Accuracy:", log_test_acc)
+print("Precision:", precision_score(y_test, logreg_preds))
+print("Recall:", recall_score(y_test, logreg_preds))
+print("F1-score:", f1_score(y_test, logreg_preds))
 
 ## ============================================================================
 ## 8. SVM with RBF kernel and GridSearchCV
@@ -259,6 +266,16 @@ print("\n[SVM] Best params:", svm_grid.best_params_)
 print("[SVM] Best CV score:", svm_cv)
 print("[SVM] Final test accuracy:", svm_test_acc)
 
+# --- NEW: Classification metrics for SVM ---
+svm_preds = svm_best.predict(X_test)
+
+print("\n=== SVM Metrics ===")
+print("Accuracy:", svm_test_acc)
+print("Precision:", precision_score(y_test, svm_preds))
+print("Recall:", recall_score(y_test, svm_preds))
+print("F1-score:", f1_score(y_test, svm_preds))
+
+
 
 ## ============================================================================
 ## 9. Test-set comparison summary
@@ -271,6 +288,23 @@ print("\n=== Model comparison on test set ===")
 print(f"Dummy baseline:   {np.mean(dummy_scores['test_score']):.3f} (CV)")
 print(f"LogReg test acc:  {log_test_acc:.3f}")
 print(f"SVM RBF test acc: {svm_test_acc:.3f}")
+
+# --- NEW: Add F1, Precision, Recall to comparison table ---
+
+# Recompute predictions (in case they were not stored)
+logreg_preds = log_best.predict(X_test)
+svm_preds = svm_best.predict(X_test)
+
+print("\n=== Extended Model Comparison (Test Set) ===")
+print(f"LogReg -> Accuracy:  {log_test_acc:.3f}, "
+      f"Precision: {precision_score(y_test, logreg_preds):.3f}, "
+      f"Recall: {recall_score(y_test, logreg_preds):.3f}, "
+      f"F1: {f1_score(y_test, logreg_preds):.3f}")
+
+print(f"SVM RBF -> Accuracy: {svm_test_acc:.3f}, "
+      f"Precision: {precision_score(y_test, svm_preds):.3f}, "
+      f"Recall: {recall_score(y_test, svm_preds):.3f}, "
+      f"F1: {f1_score(y_test, svm_preds):.3f}")
 
 
 ## ============================================================================
