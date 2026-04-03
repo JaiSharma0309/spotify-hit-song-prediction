@@ -1,35 +1,312 @@
+# Spotify Hit Song Prediction
 
-# Hit Song Prediction Using Spotify Data
+This project uses Spotify audio features and metadata to predict whether a song is likely to be a hit.
 
-In 2025, music industry analysts noticed something surprising: for the first time since 1990, not a single hip-hop song appeared in the US Billboard Top 40. This sparked a lot of debate online about whether hip-hop was “falling off,” changing direction, or simply shifting toward different listening habits. That discussion inspired this project. Instead of arguing based on opinions, I wanted to explore the question with data: what actually makes a song a hit? Using Spotify’s audio features, metadata, and artist information, this project builds a machine-learning system that predicts whether a song is likely to become a hit based purely on its characteristics. Although the motivation comes from hip-hop trends, the final dataset includes songs from all genres so the model can learn general hit-song patterns rather than genre-specific quirks.
+The repo has two main stages:
 
-The project starts with a basic dataset of songs containing titles, artists, and Spotify audio features such as danceability, energy, tempo, acousticness, and valence. I wrote a script (spotify_query.py) that connects to the Spotify Web API and enriches each track with additional attributes like release date, album type, explicit flag, Spotify popularity, artist popularity, and genre tags. This step produces a fully enhanced dataset called spotify_enriched.csv, which provides the metadata needed to study hit-song patterns.
+1. Enrich a base song dataset with Spotify track and artist metadata.
+2. Train classification models to predict whether a song belongs to the top-performing group of tracks.
 
-The machine-learning workflow (hit_song.py) follows standard supervised-learning practices. I define a “hit” as any song in the top 25% of track popularity on Spotify—similar to how charts measure relative success. Then I preprocess the data using a scikit-learn ColumnTransformer, which scales numeric features and applies one-hot encoding to categorical ones. I train three models: a DummyClassifier baseline, Logistic Regression, and an SVM with an RBF kernel. After cross-validation and hyperparameter tuning, the SVM performs the best, achieving test accuracy around 87% and showing slightly stronger separation in its ROC curve compared with Logistic Regression. These ROC curves, included in the figures folder, illustrate how both models provide strong ranking ability, with the SVM maintaining a small but consistent edge.
+The best model in the current project is an SVM with an RBF kernel.
 
-To interpret what drives success, I examine logistic regression coefficients and permutation-based feature importance for the SVM. The permutation importance plot shows that artist popularity dominates all other predictors, emphasizing the real-world advantage that large, established fanbases have on streaming behavior. Beyond that, features such as valence, release year, energy, loudness, instrumentalness, and various key signatures contribute meaningfully to the model. These findings align with the logistic-regression coefficient rankings and highlight consistent patterns across linear and nonlinear models. I also visualize how individual audio features differ between hits and non-hits using violin plots for danceability, energy, tempo, and valence. These plots reveal clear distribution shifts—hits tend to be slightly more energetic, brighter in mood, and marginally more danceable—providing an intuitive, human-interpretable link to the model’s learned behavior.
+## Project Goal
 
-Overall, this project uses real audio data and modern machine-learning techniques to analyze what contributes to commercial music success. It approaches the “hip-hop falloff” conversation from a data-driven perspective and provides a reproducible framework for studying music trends, predicting hits, and understanding how artistic and acoustic features interact with listeners’ preferences at scale.
+The central question is:
 
-To run the project end-to-end, users must first supply their own Spotify API credentials. The script spotify_query.py requires a personal Spotify client ID and client secret, which should be set as environment variables (SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET) before running any data collection. Once the keys are configured, running spotify_query.py pulls audio features, metadata, and artist information from Spotify and writes the combined output to spotify_enriched.csv. After the dataset is created, the full modeling pipeline can be executed by running hit_song.py, which trains the models, prints all evaluation results directly to the terminal, and saves the generated charts—including ROC curves, permutation-importance plots, and violin distributions—into the figures/ directory. This provides a complete and reproducible workflow, with all results visible either in the terminal or in the generated images.
+Can we predict whether a song will be a "hit" using its Spotify audio features and related metadata?
 
+To answer that, the project combines:
 
+- audio features already present in the base dataset
+- Spotify API metadata collected per track and artist
+- supervised machine learning for binary hit prediction
+- model interpretation and visualizations
 
+## Repository Structure
 
-Final SVM test accuracy: 87%
+```text
+spotify-hit-song-prediction/
+├── README.md
+├── CONTRIBUTING.md
+├── LICENSE
+├── pyproject.toml
+├── requirements.txt
+├── data/
+│   ├── spotify.csv
+│   └── spotify_enriched.csv
+├── figures/
+│   ├── perm_importance_svm.png
+│   ├── roc_logreg_vs_svm.png
+│   ├── violin_danceability.png
+│   ├── violin_energy.png
+│   ├── violin_tempo.png
+│   └── violin_valence.png
+├── results/
+│   ├── model_output.txt
+│   └── summary.md
+├── src/
+│   ├── hit_song.py
+│   └── spotify_query.py
+└── tests/
+    └── test_project.py
+```
 
-Baseline accuracy: ~74.6%
+## What Each File Does
 
-Most important feature: artist popularity
+### `src/spotify_query.py`
 
+Enriches the raw song dataset with Spotify metadata.
 
+It:
 
+- reads `data/spotify.csv`
+- queries the Spotify Web API
+- adds matched track and artist information
+- collects:
+  - `spotify_id`
+  - `matched_title`
+  - `matched_artist`
+  - `release_date`
+  - `album_type`
+  - `explicit`
+  - `track_popularity`
+  - `artist_popularity`
+  - `genres`
+- writes the enriched dataset to `data/spotify_enriched.csv`
 
+### `src/hit_song.py`
 
+Runs the machine learning workflow.
 
-UPDATE:
+It:
 
-Future Improvements:
+- loads `data/spotify_enriched.csv`
+- creates a binary `hit` label using the top 25% of `track_popularity`
+- engineers `release_year` from `release_date`
+- preprocesses numeric and categorical features with a `ColumnTransformer`
+- trains and evaluates:
+  - `DummyClassifier`
+  - `LogisticRegression`
+  - `SVC(kernel="rbf")`
+- tunes models with `GridSearchCV`
+- reports accuracy, precision, recall, and F1-score
+- extracts logistic regression coefficients for interpretation
+- computes permutation importance for the SVM
+- saves plots to `figures/`
 
+### `data/spotify.csv`
 
-In addition to accuracy, the models were evaluated using precision, recall, and F1-score to better understand their performance on the minority “hit” class. The Logistic Regression model achieved a precision of 0.733, recall of 0.656, and an F1-score of 0.692, indicating that while its predictions were fairly reliable, it still missed a meaningful share of true hits. The SVM with an RBF kernel performed slightly better overall, with precision of 0.790, recall of 0.667, and an F1-score of 0.723, suggesting it makes fewer false positive predictions while maintaining a stronger balance between identifying hits and avoiding incorrect ones. These results point to clear next steps for the project: improving recall should be a priority so the model captures more true hits, potentially through techniques like class weighting, resampling, or experimenting with models such as Random Forests or Gradient Boosting. Additionally, incorporating more recent Spotify data or alternative definitions of a “hit” could help refine performance and make the system more robust over time.
+The base dataset containing:
+
+- song title
+- artist name
+- Spotify audio features such as `danceability`, `energy`, `tempo`, `valence`, and more
+
+### `data/spotify_enriched.csv`
+
+The enriched dataset used by the ML pipeline.
+
+### `figures/`
+
+Saved charts generated by the modeling script:
+
+- violin plots comparing hits vs non-hits
+- SVM permutation feature importance
+- ROC curve comparison for Logistic Regression vs SVM
+
+### `results/model_output.txt`
+
+Saved terminal output from a full run of the modeling script.
+
+### `results/summary.md`
+
+A short report-style summary of the saved modeling results and takeaways.
+
+### `requirements.txt` and `pyproject.toml`
+
+Dependency and project metadata files for reproducible setup.
+
+### `CONTRIBUTING.md`
+
+Basic setup and workflow notes for future contributors.
+
+### `tests/test_project.py`
+
+A lightweight test suite that checks core repo files, required dataset columns, and the saved hit-threshold assumption used in the project.
+
+## Modeling Approach
+
+### Target Definition
+
+A song is labeled as a hit if its `track_popularity` is greater than or equal to the 75th percentile of the dataset.
+
+This turns the problem into binary classification:
+
+- `0` = non-hit
+- `1` = hit
+
+### Features Used
+
+Numeric features:
+
+- `acousticness`
+- `danceability`
+- `duration_ms`
+- `energy`
+- `instrumentalness`
+- `liveness`
+- `loudness`
+- `speechiness`
+- `tempo`
+- `valence`
+- `artist_popularity`
+- `release_year`
+
+Categorical features:
+
+- `key`
+- `mode`
+- `time_signature`
+- `album_type`
+- `explicit`
+
+### Preprocessing
+
+The pipeline uses:
+
+- median imputation + standard scaling for numeric features
+- most-frequent imputation + one-hot encoding for categorical features
+
+### Models Compared
+
+- Dummy baseline
+- Logistic Regression
+- SVM with RBF kernel
+
+## Reproducing the Project
+
+### 1. Create a Python environment
+
+Use Python 3.10+ if possible.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+### 2. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Add Spotify API credentials
+
+Create a Spotify app and export your credentials:
+
+```bash
+export SPOTIFY_CLIENT_ID="your_client_id"
+export SPOTIFY_CLIENT_SECRET="your_client_secret"
+```
+
+### 4. Enrich the dataset
+
+From the repository root:
+
+```bash
+python src/spotify_query.py
+```
+
+This reads from `data/spotify.csv` and writes to `data/spotify_enriched.csv`.
+
+### 5. Train and evaluate the models
+
+From the repository root:
+
+```bash
+python src/hit_song.py
+```
+
+This will:
+
+- load `data/spotify_enriched.csv`
+- train the baseline, logistic regression, and SVM models
+- print evaluation output in the terminal
+- save figures into `figures/`
+
+### 6. Run the lightweight tests
+
+```bash
+pytest
+```
+
+## Results Summary
+
+Based on the saved output in `results/model_output.txt`:
+
+- Total tracks in the enriched dataset: `2017`
+- Total usable tracks after dropping missing `track_popularity`: `1882`
+- Hit threshold (`track_popularity` 75th percentile): `62.0`
+- Dummy baseline accuracy: `0.746`
+- Logistic Regression test accuracy: `0.851`
+- SVM test accuracy: `0.870`
+
+Additional test-set metrics:
+
+- Logistic Regression: precision `0.733`, recall `0.656`, F1 `0.692`
+- SVM: precision `0.790`, recall `0.667`, F1 `0.723`
+
+## Main Findings
+
+### 1. Artist popularity is the strongest predictor
+
+Across both logistic regression coefficients and SVM permutation importance, `artist_popularity` is the dominant feature.
+
+### 2. The SVM performs best overall
+
+The RBF SVM slightly outperforms logistic regression on the test set and provides the best overall performance in the current repo.
+
+### 3. Audio features still matter
+
+Beyond artist popularity, the model highlights useful signal from:
+
+- `valence`
+- `energy`
+- `danceability`
+- `loudness`
+- `instrumentalness`
+- `release_year`
+
+### 4. Hits and non-hits show visible distribution differences
+
+The violin plots suggest that hits tend to be:
+
+- somewhat more energetic
+- slightly more danceable
+- somewhat brighter in mood
+
+## Current Limitations
+
+- The hit label is based only on Spotify popularity, which is one reasonable definition of success but not the only one.
+- The project currently uses scripts rather than a packaged CLI workflow.
+- Class recall is decent but still leaves room to catch more true hits.
+
+## Next Steps
+
+Good follow-up improvements for this project would be:
+
+- experiment with class weighting or resampling to improve recall
+- compare against tree-based models such as Random Forest or Gradient Boosting
+- evaluate alternative definitions of a hit
+- add more recent data and test generalization over time
+- package the workflow behind a more formal command-line interface
+
+## Quick Start
+
+If you already have `data/spotify_enriched.csv`, you can skip the API step and go straight to:
+
+```bash
+python src/hit_song.py
+```
+
+That is the fastest way to reproduce the modeling results and regenerate the figures.
