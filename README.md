@@ -1,13 +1,24 @@
 # Spotify Hit Song Prediction
 
-This project uses Spotify audio features and metadata to predict whether a song is likely to be a hit.
+Predict whether a Spotify song is a hit using audio features, track metadata, and artist metadata.
 
-The repo has two main stages:
+In one pass, this project:
 
-1. Enrich a base song dataset with Spotify track and artist metadata.
-2. Train classification models to predict whether a song belongs to the top-performing group of tracks.
+1. enriches a raw song dataset with Spotify API data
+2. trains classification models to label songs as hit vs non-hit
+3. explains which features matter most
 
-The best model in the current project is an SVM with an RBF kernel.
+Best current model: `SVM (RBF)` with `87.0%` test accuracy.
+
+## Project Snapshot
+
+- Goal: predict whether a song falls into the top 25% of Spotify popularity
+- Input: audio features such as `danceability`, `energy`, `tempo`, and `valence`
+- Added metadata: `track_popularity`, `artist_popularity`, `release_date`, `album_type`, `genres`
+- Best finding: `artist_popularity` is the strongest predictor by far
+- Output: trained models, evaluation metrics, ROC curves, violin plots, and feature-importance charts
+
+![ROC curve comparison](figures/roc_logreg_vs_svm.png)
 
 ## Project Goal
 
